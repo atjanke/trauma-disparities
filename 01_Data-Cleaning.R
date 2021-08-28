@@ -81,12 +81,8 @@ df <- df %>%
   mutate(CATSCAN = factor(case_when(
     CATSCAN==0 ~ "No CT performed", CATSCAN==1 ~ "CT imaging performed"))) %>%
   mutate(ADMIT = factor(case_when(
-    ADMIT==1 ~ "Critical care unit",
-    ADMIT==2 ~ "Stepdown unit",
-    ADMIT==3 ~ "Operating room",
-    ADMIT==4 ~ "Mental health or detox unit",
-    ADMIT==5 ~ "Cardiac catheterization lab",
-    ADMIT==6 ~ "Other unit/bed",
+    ADMIT==1 ~ "Critical care unit",ADMIT==2 ~ "Stepdown unit",ADMIT==3 ~ "Operating room",
+    ADMIT==4 ~ "Mental health or detox unit",ADMIT==5 ~ "Cardiac catheterization lab",ADMIT==6 ~ "Other unit/bed",
     T ~ "Discharge/Not applicable"))) %>%
   mutate(LOS = as.integer(LOS)) %>%
   mutate(LOS = as.integer(case_when(
