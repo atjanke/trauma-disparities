@@ -1,6 +1,14 @@
 library(haven)
 library(tidyr)
 library(dplyr)
+library(stringr)
+
+
+df <- read_dta("data-raw/ED2017-stata.dta") %>%
+  select(VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
+         PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,CATSCAN,CTAB,
+         CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,MED,MED1:MED30,GPMED1:GPMED30 
+  ) %>% data.frame() %>% zap_labels()
 
 df <- read_dta("data-raw/ED2018-stata.dta") %>%
   select(
@@ -9,7 +17,6 @@ df <- read_dta("data-raw/ED2018-stata.dta") %>%
     ARRTIME, #Arrival time (military time)
     ARREMS, #Arrival by EMS
     WAITTIME, #Wait time to first provider contact, in minutes
-    LOV, #Length of visit, in minutes
     AGE, #Patient age in years
     SEX, #Patient sex
     RACEUN, #Race, not imputed 
@@ -26,11 +33,15 @@ df <- read_dta("data-raw/ED2018-stata.dta") %>%
     CTOTHER, # CT scan - other
     CTUNK, # CT scan - unknown location
     ADMIT, #Admission (and where?)
-    LOS, #Length of stay in hospital (days)
+#    LOS, #Length of stay in hospital (days)
     MED, # Were medications or immunizations given at this visit or prescribed at ED discharge
     MED1:MED30, #Medications administered
     GPMED1:GPMED30 #Flag for medication in ED or prescription at discharge
-  ) %>% data.frame()
+  ) %>% data.frame() %>%
+  rbind(df)
+
+
+
 
 # Recode variables
 df <- df %>%
@@ -38,10 +49,10 @@ df <- df %>%
   mutate(WAITTIME = as.integer(case_when(
     WAITTIME<0 ~ NA_integer_,
     WAITTIME>=0 ~ WAITTIME))) %>%
-  mutate(LOV = as.integer(LOV)) %>%
-  mutate(LOV = as.integer(case_when(
-    LOV<0 ~ NA_integer_,
-    LOV>=0 ~ LOV))) %>%
+#  mutate(LOV = as.integer(LOV)) %>%
+#   mutate(LOV = as.integer(case_when(
+#     LOV<0 ~ NA_integer_,
+#     LOV>=0 ~ LOV))) %>%
   mutate(ARREMS = factor(case_when(ARREMS==1 ~ "Yes",ARREMS==2 ~ "No", T ~ "Unknown"))) %>%
   mutate(SEX = factor(case_when(SEX==1 ~ "Female",SEX==0 ~ "Male", T ~ "Unknown"))) %>%
   mutate(RACE = factor(case_when(
@@ -84,10 +95,12 @@ df <- df %>%
     ADMIT==1 ~ "Critical care unit",ADMIT==2 ~ "Stepdown unit",ADMIT==3 ~ "Operating room",
     ADMIT==4 ~ "Mental health or detox unit",ADMIT==5 ~ "Cardiac catheterization lab",ADMIT==6 ~ "Other unit/bed",
     T ~ "Discharge/Not applicable"))) %>%
-  mutate(LOS = as.integer(LOS)) %>%
-  mutate(LOS = as.integer(case_when(
-    LOS<0 ~ NA_integer_,
-    LOS>=0 ~ LOS))) %>%
+  # mutate(LOS = as.integer(LOS)) %>%
+  # mutate(LOS = as.integer(case_when(
+  #   LOS<0 ~ NA_integer_,
+  #   LOS>=0 ~ LOS))) %>%
   select(-RACEUN,-ETHUN,-PAYTYPER)
 
 source("01a_Indicator-for-Pain-Meds.R")
+
+saveRDS(df,"data-cleaned/df.rds")
