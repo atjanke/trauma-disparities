@@ -99,7 +99,7 @@ df <- df %>%
   # mutate(LOS = as.integer(case_when(
   #   LOS<0 ~ NA_integer_,
   #   LOS>=0 ~ LOS))) %>%
-  select(-RACEUN,-ETHUN,-PAYTYPER)
+  select(-RACEUN,-ETHUN,-PAYTYPER) %>% zap_labels()
 
 source("01a_Indicator-for-Pain-Meds.R")
 

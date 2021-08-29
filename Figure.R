@@ -1,5 +1,9 @@
 library(ggplot2)
+library(tidyr)
+library(dplyr)
 library(modelr)
+
+source("Functions.R")
 
 df <- readRDS("data-cleaned/df.rds")
 
@@ -12,8 +16,13 @@ pain_scale <- df %>%
     RACE=="Black/African American" ~ RACE,
     T ~ "Other")) %>%
   group_by(PAINSCALE,RACE) %>%
-  summarise(Meds_Given = 
-              sum(ifelse(Meds_Given==1,1,0))/n())
+  summarise(
+    Count = n(),
+    Meds_Given = 
+              sum(ifelse(Meds_Given==1,1,0))/n()) %>%
+  mutate(
+    Lower = Lower_Bound(Meds_Given*Count,Count),
+    Upper = Upper_Bound(Meds_Given*Count,Count))
   
 ggplot(
   filter(
@@ -21,6 +30,7 @@ ggplot(
   ,RACE!="Other")
   ,aes(x=PAINSCALE,y=Meds_Given,color=RACE))+
   geom_point(size=4)+
+  geom_errorbar(aes(ymin=Lower, ymax=Upper),width=0.1)+
   scale_y_continuous(labels=scales::percent)+
   scale_x_continuous(breaks=c(3:10),limits=c(3,10))+
   ylab("Proportion of Patients Receiving Pain Medication")+
