@@ -3,7 +3,7 @@
 # *prescribed* during the ED visit, rather than 
 # given during the encounter.
 
-table <- data.frame(N = 1:37000)
+table <- data.frame(N = 1:56467)
 
 for (i in 1:30) {
   build <- df %>% select(MED1:GPMED30)

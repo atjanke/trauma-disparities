@@ -44,7 +44,7 @@ df <- read_dta("data-raw/ED2018-stata.dta") %>%
 
 
 # Recode variables
-df <- df %>%
+combined <- combined %>%
   mutate(WAITTIME = as.integer(WAITTIME)) %>%
   mutate(WAITTIME = as.integer(case_when(
     WAITTIME<0 ~ NA_integer_,
@@ -103,4 +103,4 @@ df <- df %>%
 
 source("01a_Indicator-for-Pain-Meds.R")
 
-saveRDS(df,"data-cleaned/df.rds")
+saveRDS(df,"data-cleaned/combined.rds")
