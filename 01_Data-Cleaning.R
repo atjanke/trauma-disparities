@@ -3,14 +3,20 @@ library(tidyr)
 library(dplyr)
 library(stringr)
 
+df <- read_dta("data-raw/ED2018-stata.dta") %>%
+  select(
+    VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,
+    CATSCAN,CTAB,CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,MED,MED1:MED30,GPMED1:GPMED30
+  ) %>% data.frame() 
 
 df <- read_dta("data-raw/ED2017-stata.dta") %>%
   select(VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
          PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,CATSCAN,CTAB,
          CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,MED,MED1:MED30,GPMED1:GPMED30 
-  ) %>% data.frame() %>% zap_labels()
+  ) %>% data.frame() %>% zap_labels() %>%
+  rbind(df)
 
-df <- read_dta("data-raw/ED2018-stata.dta") %>%
+df <- read_dta("data-raw/ED2016-stata.dta") %>%
   select(
     VMONTH, #Visit month (1-12)
     VDAYR, #Day of week of visit (1-7)
@@ -33,18 +39,22 @@ df <- read_dta("data-raw/ED2018-stata.dta") %>%
     CTOTHER, # CT scan - other
     CTUNK, # CT scan - unknown location
     ADMIT, #Admission (and where?)
-#    LOS, #Length of stay in hospital (days)
+    #LOS, #Length of stay in hospital (days)
     MED, # Were medications or immunizations given at this visit or prescribed at ED discharge
     MED1:MED30, #Medications administered
     GPMED1:GPMED30 #Flag for medication in ED or prescription at discharge
-  ) %>% data.frame() %>%
+  ) %>% data.frame() %>% zap_labels() %>% rbind(df)
+
+
+df <- read_dta("data-raw/ED2015-stata.dta") %>%
+  select(VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
+         PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,CATSCAN,CTAB,
+         CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,MED,MED1:MED30,GPMED1:GPMED30 
+  ) %>% data.frame() %>% zap_labels() %>%
   rbind(df)
 
-
-
-
 # Recode variables
-combined <- combined %>%
+df <- df %>%
   mutate(WAITTIME = as.integer(WAITTIME)) %>%
   mutate(WAITTIME = as.integer(case_when(
     WAITTIME<0 ~ NA_integer_,
@@ -103,4 +113,4 @@ combined <- combined %>%
 
 source("01a_Indicator-for-Pain-Meds.R")
 
-saveRDS(df,"data-cleaned/combined.rds")
+saveRDS(df,"data-cleaned/df.rds")

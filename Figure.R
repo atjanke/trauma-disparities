@@ -5,7 +5,7 @@ library(modelr)
 
 source("Functions.R")
 
-df <- readRDS("data-cleaned/combined.rds")
+df <- readRDS("data-cleaned/df.rds")
 
 pain_scale <- df %>%
   filter(PAINSCALE > 6) %>%
@@ -46,13 +46,19 @@ ggplot(
 
 age_ct <-
   df %>%
-  group_by(AGE, VDAYR) %>%
+  filter(AGE>4 & AGE<30) %>%
+  filter(INJURY_ENC=="Initial encounter") %>%
+  group_by(AGE) %>%
   summarise(
-    CT_Rate = sum(ifelse(CATSCAN=="CT imaging performed",1,0))/n())
+    CT_Rate = sum(ifelse(CATSCAN=="CT imaging performed",1,0))/n(),
+    Visit_Count = n())
 
 age_ct %>%
   mutate(Discontinuity = as.factor(ifelse(AGE<16,1,0))) %>%
-  ggplot(aes(x=AGE,y=CT_Rate,color=Discontinuity)) +
+  ggplot(aes(x=AGE,y=Visit_Count,color=Discontinuity)) +
   geom_point()+
   geom_smooth(method="loess")+
-  facet_wrap(~VDAYR)
+  geom_vline(xintercept=15.5,linetype="dashed")+
+  theme_bw()+
+  scale_x_continuous(limits=c(0,35))+
+  scale_y_continuous()+xlab("Age")+ylab("Proportion of Visits, Any CT Done")
