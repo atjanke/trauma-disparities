@@ -1,19 +1,18 @@
-library(haven)
-library(tidyr)
-library(dplyr)
-library(stringr)
+source("Libraries.R")
 
 df <- read_dta("data-raw/ED2018-stata.dta") %>%
   select(
     VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,
-    CATSCAN,CTAB,CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,MED,MED1:MED30,GPMED1:GPMED30
-  ) %>% data.frame() 
+    CATSCAN,CTAB,CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30
+  ) %>% data.frame() %>%
+  mutate(YEAR=2018)
 
 df <- read_dta("data-raw/ED2017-stata.dta") %>%
   select(VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
          PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,CATSCAN,CTAB,
-         CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,MED,MED1:MED30,GPMED1:GPMED30 
+         CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30 
   ) %>% data.frame() %>% zap_labels() %>%
+  mutate(YEAR=2017) %>%
   rbind(df)
 
 df <- read_dta("data-raw/ED2016-stata.dta") %>%
@@ -39,18 +38,24 @@ df <- read_dta("data-raw/ED2016-stata.dta") %>%
     CTOTHER, # CT scan - other
     CTUNK, # CT scan - unknown location
     ADMIT, #Admission (and where?)
+    TOXSCREN, #Urine toxicology screen
     #LOS, #Length of stay in hospital (days)
     MED, # Were medications or immunizations given at this visit or prescribed at ED discharge
     MED1:MED30, #Medications administered
     GPMED1:GPMED30 #Flag for medication in ED or prescription at discharge
-  ) %>% data.frame() %>% zap_labels() %>% rbind(df)
+  ) %>% data.frame() %>% 
+  mutate(YEAR=2016) %>%
+  zap_labels() %>% rbind(df)
 
 
 df <- read_dta("data-raw/ED2015-stata.dta") %>%
+  # We need to manually rename INJR1 --> INJURY_ENC
+  rename(INJURY_ENC=INJR1) %>%
   select(VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
          PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,CATSCAN,CTAB,
-         CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,MED,MED1:MED30,GPMED1:GPMED30 
+         CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30 
   ) %>% data.frame() %>% zap_labels() %>%
+  mutate(YEAR=2015) %>%
   rbind(df)
 
 # Recode variables
@@ -112,5 +117,8 @@ df <- df %>%
   select(-RACEUN,-ETHUN,-PAYTYPER) %>% zap_labels()
 
 source("01a_Indicator-for-Pain-Meds.R")
+
+# Remove extraneous 'N' column
+df <- df %>% select(-N)
 
 saveRDS(df,"data-cleaned/df.rds")
