@@ -7,7 +7,10 @@ df <- readRDS("data-cleaned/df.rds")
 #####################################
 # Figure for # of Urine drug screens
 df %>%
-  group_by(RACE) %>%
+  filter(Chest_Pain==1) %>%
+  filter(AGE>13) %>%
+#  filter(SEX=="Female") %>%
+  group_by(RACE,SEX) %>%
   summarise(
     TOXSCREN_TOT  = sum(TOXSCREN),
     TOTAL_ENC = n(),
