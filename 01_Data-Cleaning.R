@@ -1,5 +1,6 @@
 source("Libraries.R")
 
+#### Individually load multiple data sets ####
 df <- read_dta("data-raw/ED2018-stata.dta") %>%
   select(
     RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,
@@ -59,7 +60,9 @@ df <- read_dta("data-raw/ED2015-stata.dta") %>%
   mutate(YEAR=2015) %>%
   rbind(df)
 
-# Recode variables
+
+#### Recode variables ####
+
 df <- df %>%
   mutate(WAITTIME = as.integer(WAITTIME)) %>%
   mutate(WAITTIME = as.integer(case_when(
@@ -117,6 +120,9 @@ df <- df %>%
   #   LOS>=0 ~ LOS))) %>%
   select(-RACEUN,-ETHUN,-PAYTYPER) %>% zap_labels()
 
+
+#### Make indicator variables of interest ####
+
 source("01a_Indicator-for-Pain-Meds.R")
 
 # Build a chest pain chief complaint indicator
@@ -130,5 +136,8 @@ df <- df %>%
 
 # Remove extraneous 'N' column
 df <- df %>% select(-N)
+
+
+#### Save the data ####
 
 saveRDS(df,"data-cleaned/df.rds")

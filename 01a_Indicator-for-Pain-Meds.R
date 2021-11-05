@@ -1,7 +1,8 @@
+#### Make a blank dataframe to populate medications given ED ####
+
 # First, we need to remove medications that were 
 # *prescribed* during the ED visit, rather than 
 # given during the encounter.
-
 table <- data.frame(N = 1:nrow(df))
 
 for (i in 1:30) {
@@ -14,12 +15,15 @@ for (i in 1:30) {
   rm(build)
 }
 colnames(table) <- c("N",paste0("Med_",rep(1:30)))
-
 # Remove MED1:GPMED30, these columns are no longer needed
 df <- df %>%
   cbind(table) %>%
   select(-(MED1:GPMED30)) %>% select(-N)
 rm(table)
+
+
+
+#### Identify individual medications ####
 
 long <- df %>%
   mutate(N = row_number()) %>%

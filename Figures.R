@@ -3,9 +3,7 @@ source("Functions.R")
 
 df <- readRDS("data-cleaned/df.rds")
 
-
-#####################################
-# Figure for # of Urine drug screens
+#### Figure for # of Urine drug screens ####
 df %>%
   filter(Chest_Pain==1) %>%
   filter(AGE>13) %>%
@@ -24,8 +22,8 @@ df %>%
   scale_y_continuous(labels=scales::percent_format())+
   theme(axis.text.x = element_text(angle = 85, vjust = 0.2, hjust=0))
 
-############################################
-# Pain medication administration by age/race
+
+#### Figure for pain meds by race ####
 
 pain_scale <- df %>%
   filter(PAINSCALE > 6) %>%
@@ -59,8 +57,8 @@ ggplot(
   xlab("Age")+
   theme_bw()
 
-#################################
-# CT utilization in trauma by age
+
+#### Figure for CT utilization by age ####
 
 age_ct <-
   df %>%
