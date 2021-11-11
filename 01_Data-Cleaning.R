@@ -60,6 +60,70 @@ df <- read_dta("data-raw/ED2015-stata.dta") %>%
   mutate(YEAR=2015) %>%
   rbind(df)
 
+df <- read_dta("data-raw/ED2014-stata.dta") %>%
+  # We need to manually rename INJR1 --> INJURY_ENC
+  rename(INJURY_ENC=INJR1) %>%
+  select(RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
+         PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,CATSCAN,CTAB,
+         CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30 
+  ) %>% data.frame() %>% zap_labels() %>%
+  mutate(YEAR=2014) %>%
+  rbind(df)
+
+df <- read_dta("data-raw/ED2013-stata.dta") %>%
+  # We need to manually rename INJR1 --> INJURY_ENC
+  rename(INJURY_ENC=INJR1) %>%
+  select(RFV1:RFV3,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
+         PAYTYPER,PAINSCALE,INJURY,CATSCAN,CTAB,
+         CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED12,GPMED1:GPMED12
+  ) %>% data.frame() %>% zap_labels() %>%
+  mutate(YEAR=2013) %>%
+  #INJURY72 and INJURY_ENC don't exist
+  #MED and GPMED only go up to MED12 and GPMED12 starting in 2013
+  #RFV only goes up to RFV3
+  mutate(INJURY72="Unk") %>%
+  mutate(INJURY_ENC="Unk") %>%
+  rbind(df)
+
+df <- read_dta("data-raw/ED2012-stata.dta") %>%
+  # We need to manually rename INJR1 --> INJURY_ENC
+  rename(INJURY_ENC=INJR1) %>%
+  select(RFV1:RFV3,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
+         PAYTYPER,PAINSCALE,INJURY,CATSCAN,CTAB,
+         CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED12,GPMED1:GPMED12
+  ) %>% data.frame() %>% zap_labels() %>%
+  mutate(YEAR=2012) %>%
+  #INJURY72 and INJURY_ENC don't exist
+  #MED and GPMED only go up to MED12 and GPMED12
+  #RFV only goes up to RFV3
+  mutate(INJURY72="Unk") %>%
+  mutate(INJURY_ENC="Unk") %>%
+  rbind(df)
+
+df <- read_dta("data-raw/ED2011-stata.dta") %>%
+  # We need to manually rename INJR1 --> INJURY_ENC
+  rename(INJURY_ENC=INJR1) %>%
+  # CTNHEAD (not head) rename to CTOTHER
+  rename(CTOTHER=CTNHEAD) %>%
+  #CTAB and CTCHEST are incorporated into CTOTHER (all under CTNHEAD)
+  select(RFV1:RFV3,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
+         PAYTYPER,PAINSCALE,INJURY,CATSCAN,
+         CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED8,GPMED1:GPMED8
+  ) %>% data.frame() %>% zap_labels() %>%
+  mutate(YEAR=2011) %>%
+  #INJURY72 and INJURY_ENC don't exist
+  #MED and GPMED only go up to MED8 and GPMED8 starting in 2011
+  #RFV only goes up to RFV3
+  mutate(INJURY72="Unk") %>%
+  mutate(INJURY_ENC="Unk") %>%
+  mutate(CTAB="Unk") %>% 
+  mutate(CTCHEST="Unk") %>%
+  rbind(df)
+
+### Starting in 2010, we lose a significant number of the variables we are considering
+#   Including "TOXSCREN" 
+
+
 
 #### Recode variables ####
 
