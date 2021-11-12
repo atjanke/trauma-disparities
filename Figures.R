@@ -28,7 +28,7 @@ df %>%
 pain_scale <- df %>%
   filter(PAINSCALE > 6) %>%
   mutate(Meds_Given  = ifelse(
-    rowSums(across(Acetaminophen:Oxycontin))>0,1,0)) %>%
+    rowSums(across(Acetaminophen:Hydrocodone_Acetaminophen))>0,1,0)) %>%
   mutate(RACE = as.character(RACE)) %>%
   mutate(RACE = case_when(
     RACE=="White" ~ RACE,

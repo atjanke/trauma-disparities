@@ -1,6 +1,6 @@
 source("Libraries.R")
 
-#### Individually load multiple data sets ####
+#### Individually load multiple data sets      ####
 df <- read_dta("data-raw/ED2018-stata.dta") %>%
   select(
     RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,
@@ -49,7 +49,6 @@ df <- read_dta("data-raw/ED2016-stata.dta") %>%
   mutate(YEAR=2016) %>%
   zap_labels() %>% rbind(df)
 
-
 df <- read_dta("data-raw/ED2015-stata.dta") %>%
   # We need to manually rename INJR1 --> INJURY_ENC
   rename(INJURY_ENC=INJR1) %>%
@@ -78,12 +77,12 @@ df <- read_dta("data-raw/ED2013-stata.dta") %>%
          CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED12,GPMED1:GPMED12
   ) %>% data.frame() %>% zap_labels() %>%
   mutate(YEAR=2013) %>%
-  #INJURY72 and INJURY_ENC don't exist
-  #MED and GPMED only go up to MED12 and GPMED12 starting in 2013
-  #RFV only goes up to RFV3
+  # INJURY72 and INJURY_ENC don't exist
+  # MED and GPMED only go up to MED12 and GPMED12 starting in 2013
+  # RFV only goes up to RFV3
   mutate(INJURY72="Unk") %>%
   mutate(INJURY_ENC="Unk") %>%
-  rbind(df)
+  rbind.all.columns(df)
 
 df <- read_dta("data-raw/ED2012-stata.dta") %>%
   # We need to manually rename INJR1 --> INJURY_ENC
@@ -98,7 +97,7 @@ df <- read_dta("data-raw/ED2012-stata.dta") %>%
   #RFV only goes up to RFV3
   mutate(INJURY72="Unk") %>%
   mutate(INJURY_ENC="Unk") %>%
-  rbind(df)
+  rbind.all.columns(df)
 
 df <- read_dta("data-raw/ED2011-stata.dta") %>%
   # We need to manually rename INJR1 --> INJURY_ENC
@@ -118,14 +117,9 @@ df <- read_dta("data-raw/ED2011-stata.dta") %>%
   mutate(INJURY_ENC="Unk") %>%
   mutate(CTAB="Unk") %>% 
   mutate(CTCHEST="Unk") %>%
-  rbind(df)
+  rbind.all.columns(df)
 
-### Starting in 2010, we lose a significant number of the variables we are considering
-#   Including "TOXSCREN" 
-
-
-
-#### Recode variables ####
+#### Recode variables                          ####
 
 df <- df %>%
   mutate(WAITTIME = as.integer(WAITTIME)) %>%
@@ -185,7 +179,12 @@ df <- df %>%
   select(-RACEUN,-ETHUN,-PAYTYPER) %>% zap_labels()
 
 
-#### Make indicator variables of interest ####
+#### Convert NAs in Medication columns to 0    ####
+
+df <- df %>% mutate_at(vars(MED9:GPMED30),~replace(.,is.na(.),0))
+
+
+#### Make indicator variables of interest      ####
 
 source("01a_Indicator-for-Pain-Meds.R")
 
