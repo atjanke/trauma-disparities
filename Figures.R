@@ -47,16 +47,29 @@ pain_scale <- df %>%
 ggplot(
   filter(
   pain_scale
-  ,RACE!="Other")
+  ,RACE!="Other" & AGECATEGORY!="(90,100]" & is.na(AGECATEGORY)==FALSE)
   ,aes(x=AGECATEGORY,y=Meds_Given,color=RACE))+
   geom_point(size=4)+
   geom_errorbar(aes(ymin=Lower, ymax=Upper),width=0.1)+
-  scale_y_continuous(labels=scales::percent)+
-  #scale_x_continuous()+
+  scale_y_continuous(labels=scales::percent,limits=c(0,0.5))+
   ylab("Proportion of Patients Receiving Pain Medication")+
   xlab("Age")+
-  theme_bw()
+  theme_bw()+
+  ggtitle("Pain Scale 7+, All ED Visits, Yes/No Pain Medication Given in ED")
+ggsave("Figures/Fig-Pain-Scale-7.jpg",width=7,height=5,dpi=600)
 
+df %>%
+  mutate(Meds_Given  = ifelse(
+    rowSums(across(Acetaminophen:Hydrocodone_Acetaminophen))>0,1,0)) %>%
+  mutate(RACE = as.character(RACE)) %>%
+  mutate(RACE = case_when(
+    RACE=="White" ~ RACE,
+    RACE=="Black/African American" ~ RACE,
+    T ~ "Other")) %>%
+  group_by(PAINSCALE,RACE) %>%
+  summarise(Meds_Given=sum(Meds_Given)/n()) %>%
+  ggplot(aes(x=PAINSCALE,y=Meds_Given,group=RACE,color=RACE))+
+  geom_line()+geom_point()
 
 #### Figure for CT utilization by age ####
 
