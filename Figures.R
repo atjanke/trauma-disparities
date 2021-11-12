@@ -69,7 +69,11 @@ df %>%
   group_by(PAINSCALE,RACE) %>%
   summarise(Meds_Given=sum(Meds_Given)/n()) %>%
   ggplot(aes(x=PAINSCALE,y=Meds_Given,group=RACE,color=RACE))+
-  geom_line()+geom_point()
+  geom_line()+geom_point()+
+  xlab("Pain Scale")+ylab("Proportion of Patients Receiving Any Pain Medication")+
+  scale_y_continuous(labels=scales::percent_format(accuracy=1))+
+  theme_bw()
+ggsave("Figures/Fig-Meds-By-Pain-Scale.jpg",width=7,height=5,dpi=600)
 
 #### Figure for CT utilization by age ####
 
