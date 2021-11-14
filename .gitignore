@@ -38,3 +38,5 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 data-raw/ED2012-stata.dta
+
+.DS_Store
