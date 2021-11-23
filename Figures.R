@@ -5,8 +5,9 @@ df <- readRDS("data-cleaned/df.rds")
 
 #### Figure for # of Urine drug screens ####
 df %>%
-  filter(Chest_Pain==1) %>%
-  filter(AGE>13) %>%
+#  filter(Chest_Pain==1) %>%
+  filter(AGE<5) %>%
+  filter(RACE=="Black/African American" | RACE=="White") %>%
 #  filter(SEX=="Female") %>%
   group_by(RACE,SEX) %>%
   summarise(
@@ -16,11 +17,15 @@ df %>%
   mutate(
     UPPER_BOUND = Upper_Bound(TOXSCREN_TOT,TOTAL_ENC),
     LOWER_BOUND = Lower_Bound(TOXSCREN_TOT,TOTAL_ENC)) %>%
-  ggplot(aes(x=RACE,y=TOXSCREN_PRO))+
-  geom_bar(stat="identity")+
-  geom_errorbar(aes(x=RACE,ymin=LOWER_BOUND,ymax=UPPER_BOUND),width=0.2,size=1,color="tomato")+
+  ggplot(aes(x=RACE,y=TOXSCREN_PRO, fill=SEX))+
+  geom_bar(stat="identity", position="dodge")+
+#  geom_errorbar(aes(x=RACE,ymin=LOWER_BOUND,ymax=UPPER_BOUND),width=0.2,size=1,color="tomato")+
   scale_y_continuous(labels=scales::percent_format())+
-  theme(axis.text.x = element_text(angle = 85, vjust = 0.2, hjust=0))
+  theme(axis.text.x = element_text(angle = 85, vjust = 0.2, hjust=0))+
+  ggtitle("Visits with a Drug Screen (Chest Pain and Age > 13)")+ 
+  xlab("Race")+ 
+  ylab("Percentage of Visits with Drug Screen") 
+
 
 
 #### Figure for pain meds by race ####
