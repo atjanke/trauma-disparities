@@ -4,6 +4,8 @@ library(dplyr)
 library(stringr)
 library(modelr)
 library(ggplot2)
+library(gridExtra)
+library(wesanderson)
 
 rbind.all.columns <- function(x, y) {
   

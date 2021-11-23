@@ -4,11 +4,31 @@ source("Functions.R")
 df <- readRDS("data-cleaned/df.rds")
 
 #### Figure for # of Urine drug screens ####
-df %>%
-#  filter(Chest_Pain==1) %>%
-  filter(AGE<5) %>%
+a <- df %>%
+  filter(Chest_Pain==1) %>%
+  filter(AGE>12) %>%
   filter(RACE=="Black/African American" | RACE=="White") %>%
-#  filter(SEX=="Female") %>%
+  group_by(RACE,SEX) %>%
+  summarise(TOXSCREN_TOT  = sum(TOXSCREN),
+            TOTAL_ENC = n(),
+            TOXSCREN_PRO  = sum(TOXSCREN)/n()) %>%
+  mutate(
+    UPPER_BOUND = Upper_Bound(TOXSCREN_TOT,TOTAL_ENC),
+    LOWER_BOUND = Lower_Bound(TOXSCREN_TOT,TOTAL_ENC)) %>%
+  ggplot(aes(x=RACE,y=TOXSCREN_PRO, fill=SEX))+
+  geom_bar(stat="identity", position = position_dodge(width=0.9))+
+  geom_errorbar(aes(x=RACE,ymin=LOWER_BOUND,ymax=UPPER_BOUND),width=0.2, position = position_dodge(width=0.9))+
+  scale_y_continuous(labels=scales::percent_format())+
+  scale_fill_manual(values=wes_palette(n=2, name="GrandBudapest2"))+
+  xlab("")+ylab("")+
+  theme(axis.text.x = element_text(angle = 0))+
+  ggtitle("Visits with a Urine Drug Screen\nChest Pain and Age > 13")+
+  guides(fill=guide_legend(title=""))+
+  theme_bw()
+b <- df %>%
+  filter(INJURY=="Injury-related") %>%
+  filter(AGE>12) %>%
+  filter(RACE=="Black/African American" | RACE=="White") %>%
   group_by(RACE,SEX) %>%
   summarise(
     TOXSCREN_TOT  = sum(TOXSCREN),
@@ -18,23 +38,27 @@ df %>%
     UPPER_BOUND = Upper_Bound(TOXSCREN_TOT,TOTAL_ENC),
     LOWER_BOUND = Lower_Bound(TOXSCREN_TOT,TOTAL_ENC)) %>%
   ggplot(aes(x=RACE,y=TOXSCREN_PRO, fill=SEX))+
-  geom_bar(stat="identity", position="dodge")+
-#  geom_errorbar(aes(x=RACE,ymin=LOWER_BOUND,ymax=UPPER_BOUND),width=0.2,size=1,color="tomato")+
+  geom_bar(stat="identity", position = position_dodge(width=0.9))+
+  geom_errorbar(aes(x=RACE,ymin=LOWER_BOUND,ymax=UPPER_BOUND),width=0.2, position = position_dodge(width=0.9))+
   scale_y_continuous(labels=scales::percent_format())+
-  theme(axis.text.x = element_text(angle = 85, vjust = 0.2, hjust=0))+
-  ggtitle("Visits with a Drug Screen (Chest Pain and Age > 13)")+ 
-  xlab("Race")+ 
-  ylab("Percentage of Visits with Drug Screen") 
+  scale_fill_manual(values=wes_palette(n=2, name="GrandBudapest2"))+
+  xlab("")+ylab("")+
+  theme(axis.text.x = element_text(angle = 0))+
+  ggtitle("Visits with a Urine Drug Screen\nInjury and Age > 13")+
+  guides(fill=guide_legend(title=""))+
+  theme_bw()
 
+grid.arrange(a,b)
+plot<-arrangeGrob(a,b)
+ggsave("Figures/Combined-Drug-Screen-Figure.jpeg",plot,width=4,height=6,dpi=600)
 
-
-#### Figure for pain meds by race ####
+#### Figure for pain meds by race       ####
 
 pain_scale <- df %>%
   filter(PAINSCALE > 6) %>%
   mutate(Meds_Given  = ifelse(
     rowSums(across(Acetaminophen:Hydrocodone_Acetaminophen))>0,1,0)) %>%
-  mutate(RACE = as.character(RACE)) %>%
+  mutate(RACE = as.character(RAC    E)) %>%
   mutate(RACE = case_when(
     RACE=="White" ~ RACE,
     RACE=="Black/African American" ~ RACE,
@@ -80,7 +104,7 @@ df %>%
   theme_bw()
 ggsave("Figures/Fig-Meds-By-Pain-Scale.jpg",width=7,height=5,dpi=600)
 
-#### Figure for CT utilization by age ####
+#### Figure for CT utilization by age   ####
 
 age_ct <-
   df %>%
