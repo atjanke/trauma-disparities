@@ -3,13 +3,13 @@ source("Libraries.R")
 #### Individually load multiple data sets      ####
 df <- read_dta("data-raw/ED2018-stata.dta") %>%
   select(
-    RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,
+    CPSUM,CSTRATM,PATWT,RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,
     CATSCAN,CTAB,CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30
   ) %>% data.frame() %>%
   mutate(YEAR=2018)
 
 df <- read_dta("data-raw/ED2017-stata.dta") %>%
-  select(RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
+  select(CPSUM,CSTRATM,PATWT,RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
          PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,CATSCAN,CTAB,
          CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30 
   ) %>% data.frame() %>% zap_labels() %>%
@@ -18,7 +18,7 @@ df <- read_dta("data-raw/ED2017-stata.dta") %>%
 
 df <- read_dta("data-raw/ED2016-stata.dta") %>%
   select(
-    RFV1:RFV5,
+    CPSUM,CSTRATM,PATWT,RFV1:RFV5,
     VMONTH, #Visit month (1-12)
     VDAYR, #Day of week of visit (1-7)
     ARRTIME, #Arrival time (military time)
@@ -52,7 +52,7 @@ df <- read_dta("data-raw/ED2016-stata.dta") %>%
 df <- read_dta("data-raw/ED2015-stata.dta") %>%
   # We need to manually rename INJR1 --> INJURY_ENC
   rename(INJURY_ENC=INJR1) %>%
-  select(RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
+  select(CPSUM,CSTRATM,PATWT,RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
          PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,CATSCAN,CTAB,
          CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30 
   ) %>% data.frame() %>% zap_labels() %>%
@@ -62,7 +62,7 @@ df <- read_dta("data-raw/ED2015-stata.dta") %>%
 df <- read_dta("data-raw/ED2014-stata.dta") %>%
   # We need to manually rename INJR1 --> INJURY_ENC
   rename(INJURY_ENC=INJR1) %>%
-  select(RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
+  select(CPSUM,CSTRATM,PATWT,RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
          PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,CATSCAN,CTAB,
          CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30 
   ) %>% data.frame() %>% zap_labels() %>%
@@ -72,7 +72,7 @@ df <- read_dta("data-raw/ED2014-stata.dta") %>%
 df <- read_dta("data-raw/ED2013-stata.dta") %>%
   # We need to manually rename INJR1 --> INJURY_ENC
   rename(INJURY_ENC=INJR1) %>%
-  select(RFV1:RFV3,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
+  select(CPSUM,CSTRATM,PATWT,RFV1:RFV3,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
          PAYTYPER,PAINSCALE,INJURY,CATSCAN,CTAB,
          CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED12,GPMED1:GPMED12
   ) %>% data.frame() %>% zap_labels() %>%
@@ -87,7 +87,7 @@ df <- read_dta("data-raw/ED2013-stata.dta") %>%
 df <- read_dta("data-raw/ED2012-stata.dta") %>%
   # We need to manually rename INJR1 --> INJURY_ENC
   rename(INJURY_ENC=INJR1) %>%
-  select(RFV1:RFV3,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
+  select(CPSUM,CSTRATM,PATWT,RFV1:RFV3,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
          PAYTYPER,PAINSCALE,INJURY,CATSCAN,CTAB,
          CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED12,GPMED1:GPMED12
   ) %>% data.frame() %>% zap_labels() %>%
@@ -105,7 +105,7 @@ df <- read_dta("data-raw/ED2011-stata.dta") %>%
   # CTNHEAD (not head) rename to CTOTHER
   rename(CTOTHER=CTNHEAD) %>%
   #CTAB and CTCHEST are incorporated into CTOTHER (all under CTNHEAD)
-  select(RFV1:RFV3,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
+  select(CPSUM,CSTRATM,PATWT,RFV1:RFV3,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
          PAYTYPER,PAINSCALE,INJURY,CATSCAN,
          CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED8,GPMED1:GPMED8
   ) %>% data.frame() %>% zap_labels() %>%
@@ -181,21 +181,22 @@ df <- df %>%
 
 #### Convert NAs in Medication columns to 0    ####
 
-df <- df %>% mutate_at(vars(MED9:GPMED30),~replace(.,is.na(.),0))
+# df <- df %>% mutate_at(vars(MED9:GPMED30),~replace(.,is.na(.),0))
 
 
 #### Make indicator variables of interest      ####
 
-source("01a_Indicator-for-Pain-Meds.R")
+# source("01a_Indicator-for-Pain-Meds.R")
 
 # Build a chest pain chief complaint indicator
 df <- df %>%
   mutate(Chest_Pain = case_when(
-    ((RFV1>=10500 & RFV1<=10503) | RFV1==12650) |
-      ((RFV2>=10500 & RFV2<=10503) | RFV2==12650) |
-      ((RFV3>=10500 & RFV3<=10503) | RFV3==12650) |
-      ((RFV4>=10500 & RFV4<=10503) | RFV4==12650) |
-      ((RFV5>=10500 & RFV5<=10503) | RFV5==12650) ~ 1, T~0))
+      (RFV1>=10500 & RFV1<=10503) | RFV1==12650 | RFV1==25150 |
+      (RFV2>=10500 & RFV2<=10503) | RFV2==12650 | RFV2==25150 |
+      (RFV3>=10500 & RFV3<=10503) | RFV3==12650 | RFV3==25150 |
+      (RFV4>=10500 & RFV4<=10503) | RFV4==12650 | RFV4==25150 |
+      (RFV5>=10500 & RFV5<=10503) | RFV5==12650 | RFV5==25150 
+        ~ 1, T~0))
 
 #### Save the data                             ####
 
