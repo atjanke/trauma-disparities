@@ -69,6 +69,13 @@ print_result("Black/African American","Female")
 print("Black males: ")
 print_result("Black/African American","Male")
 
+print("Unknown race, females: ")
+print_result("Unknown","Female")
+print("Unknown race, males: ")
+print_result("Unknown","Male")
+
+
+
 # Report odds ratios for binary logistic regression model for UDS
 library(aod)
 
