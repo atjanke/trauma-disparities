@@ -1,18 +1,77 @@
+#### Load libraries, define variable lists     ####
+
 source("Libraries.R")
 
+# "NODISP"      No answer to item
+# "NOFU"        No follow-up planned
+# "RETRNED"     Return to ED
+# "RETREFFU"    Return/Refer to physician/clinic for FU
+# "LWBS"        Left without being seen (LWBS)
+# "LBTC"        Left before treatment complete (LBTC)
+# "LEFTAMA"     Left AMA (against medical advice)
+# "DOA"         DOA (dead on arrival)
+# "DIEDED"      Died in ED
+# "TRANNH"      Return/transfer to nursing home
+# "TRANPSYC"    Transfer to psychiatric hospital
+# "TRANOTH"     Transfer to non-psychiatric hospital
+# "ADMITHOS"    Admit to this hospital
+# "OBSHOS"      Admit to observation unit, then hospitalized
+# "OBSDIS"      Admit to observation unit, then discharged
+# "OTHDISP"     Other visit disposition
+# "ADMIT"       Categories for admissions
+
+list.dispo.variables.16.19 <- c("NODISP","NOFU","RETRNED","RETREFFU","LWBS","LBTC",
+                          "LEFTAMA","DOA","DIEDED","TRANNH","TRANPSYC","TRANOTH",
+                          "ADMITHOS","OBSHOS","OBSDIS","OTHDISP")
+
+list.dispo.variables.12.15 <- c("NODISP","NOFU","RETRNED","RETREFFU","LEFTBTRI","LEFTATRI",
+                             "LEFTAMA","DOA","DIEDED","TRANNH","TRANPSYC","TRANOTH",
+                             "ADMITHOS","OBSHOS","OBSDIS","OTHDISP")
+
+list.dispo.variables.11    <- c("NODISP","NOFU","RETPRN","RETREFFU","LEFTBTRI","LEFTATRI",
+                                "LEFTAMA","DOA","DIEDED","TRANNH","TRANPSYC","TRANOTH",
+                                "ADMITHOS","OBSHOS","OBSDIS","OTHDISP")
+
 #### Individually load multiple data sets      ####
+df <- read_dta("data-raw/ED2019-stata.dta") %>%
+  select(
+    CPSUM,CSTRATM,PATWT,RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,
+    CATSCAN,CTAB,CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30,all_of(list.dispo.variables.16.19)
+  ) %>% data.frame() %>% zap_labels() %>%
+  mutate(DISPOSITION = case_when(
+    ADMITHOS==1 | OBSHOS==1 | OBSDIS==1   | TRANOTH==1  | TRANPSYC==1    ~ "Admission",
+    NOFU==1     | RETRNED==1| RETREFFU==1 | LWBS==1     | LBTC==1 | LEFTAMA==1  | TRANNH==1  ~"Discharge",
+    DOA==1      | DIEDED==1      ~"Died",
+    NODISP==1   | OTHDISP==1     ~"Unknown")) %>%
+  select(-all_of(list.dispo.variables.16.19)) %>%
+  mutate(YEAR=2019)
+
+
 df <- read_dta("data-raw/ED2018-stata.dta") %>%
   select(
     CPSUM,CSTRATM,PATWT,RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,
-    CATSCAN,CTAB,CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30
-  ) %>% data.frame() %>%
-  mutate(YEAR=2018)
+    CATSCAN,CTAB,CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30,all_of(list.dispo.variables.16.19)
+  ) %>% data.frame() %>% zap_labels() %>%
+  mutate(DISPOSITION = case_when(
+    ADMITHOS==1 | OBSHOS==1 | OBSDIS==1   | TRANOTH==1  | TRANPSYC==1    ~ "Admission",
+    NOFU==1     | RETRNED==1| RETREFFU==1 | LWBS==1     | LBTC==1 | LEFTAMA==1  | TRANNH==1  ~"Discharge",
+    DOA==1      | DIEDED==1      ~"Died",
+    NODISP==1   | OTHDISP==1     ~"Unknown")) %>%
+  select(-all_of(list.dispo.variables.16.19)) %>%
+  mutate(YEAR=2018) %>%
+  rbind(df)
 
 df <- read_dta("data-raw/ED2017-stata.dta") %>%
   select(CPSUM,CSTRATM,PATWT,RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
          PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,CATSCAN,CTAB,
-         CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30 
+         CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30,all_of(list.dispo.variables.16.19)
   ) %>% data.frame() %>% zap_labels() %>%
+  mutate(DISPOSITION = case_when(
+    ADMITHOS==1 | OBSHOS==1 | OBSDIS==1   | TRANOTH==1  | TRANPSYC==1    ~ "Admission",
+    NOFU==1     | RETRNED==1| RETREFFU==1 | LWBS==1     | LBTC==1 | LEFTAMA==1  | TRANNH==1  ~"Discharge",
+    DOA==1      | DIEDED==1      ~"Died",
+    NODISP==1   | OTHDISP==1     ~"Unknown")) %>%
+  select(-all_of(list.dispo.variables.16.19)) %>%
   mutate(YEAR=2017) %>%
   rbind(df)
 
@@ -44,8 +103,15 @@ df <- read_dta("data-raw/ED2016-stata.dta") %>%
     #LOS, #Length of stay in hospital (days)
     MED, # Were medications or immunizations given at this visit or prescribed at ED discharge
     MED1:MED30, #Medications administered
-    GPMED1:GPMED30 #Flag for medication in ED or prescription at discharge
-  ) %>% data.frame() %>% 
+    GPMED1:GPMED30, #Flag for medication in ED or prescription at discharge
+    all_of(list.dispo.variables.16.19)
+  ) %>% data.frame() %>%
+  mutate(DISPOSITION = case_when(
+    ADMITHOS==1 | OBSHOS==1 | OBSDIS==1   | TRANOTH==1  | TRANPSYC==1    ~ "Admission",
+    NOFU==1     | RETRNED==1| RETREFFU==1 | LWBS==1     | LBTC==1 | LEFTAMA==1  | TRANNH==1  ~"Discharge",
+    DOA==1      | DIEDED==1      ~"Died",
+    NODISP==1   | OTHDISP==1     ~"Unknown")) %>%
+  select(-all_of(list.dispo.variables.16.19)) %>%
   mutate(YEAR=2016) %>%
   zap_labels() %>% rbind(df)
 
@@ -54,8 +120,15 @@ df <- read_dta("data-raw/ED2015-stata.dta") %>%
   rename(INJURY_ENC=INJR1) %>%
   select(CPSUM,CSTRATM,PATWT,RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
          PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,CATSCAN,CTAB,
-         CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30 
+         CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30,
+         all_of(list.dispo.variables.12.15)
   ) %>% data.frame() %>% zap_labels() %>%
+  mutate(DISPOSITION = case_when(
+    ADMITHOS==1 | OBSHOS==1 | OBSDIS==1   | TRANOTH==1  | TRANPSYC==1    ~ "Admission",
+    NOFU==1     | RETRNED==1| RETREFFU==1 | LEFTAMA==1  | TRANNH==1   | LEFTBTRI==1 | LEFTATRI==1 ~"Discharge",
+    DOA==1      | DIEDED==1      ~"Died",
+    NODISP==1   | OTHDISP==1     ~"Unknown")) %>%
+  select(-all_of(list.dispo.variables.12.15)) %>%
   mutate(YEAR=2015) %>%
   rbind(df)
 
@@ -64,8 +137,14 @@ df <- read_dta("data-raw/ED2014-stata.dta") %>%
   rename(INJURY_ENC=INJR1) %>%
   select(CPSUM,CSTRATM,PATWT,RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
          PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,CATSCAN,CTAB,
-         CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30 
+         CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30,all_of(list.dispo.variables.12.15)
   ) %>% data.frame() %>% zap_labels() %>%
+  mutate(DISPOSITION = case_when(
+    ADMITHOS==1 | OBSHOS==1 | OBSDIS==1   | TRANOTH==1  | TRANPSYC==1    ~ "Admission",
+    NOFU==1     | RETRNED==1| RETREFFU==1 | LEFTAMA==1  | TRANNH==1   | LEFTBTRI==1 | LEFTATRI==1 ~"Discharge",
+    DOA==1      | DIEDED==1      ~"Died",
+    NODISP==1   | OTHDISP==1     ~"Unknown")) %>%
+  select(-all_of(list.dispo.variables.12.15)) %>%
   mutate(YEAR=2014) %>%
   rbind(df)
 
@@ -74,9 +153,15 @@ df <- read_dta("data-raw/ED2013-stata.dta") %>%
   rename(INJURY_ENC=INJR1) %>%
   select(CPSUM,CSTRATM,PATWT,RFV1:RFV3,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
          PAYTYPER,PAINSCALE,INJURY,CATSCAN,CTAB,
-         CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED12,GPMED1:GPMED12
+         CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED12,GPMED1:GPMED12,all_of(list.dispo.variables.12.15)
   ) %>% data.frame() %>% zap_labels() %>%
   mutate(YEAR=2013) %>%
+  mutate(DISPOSITION = case_when(
+    ADMITHOS==1 | OBSHOS==1 | OBSDIS==1   | TRANOTH==1  | TRANPSYC==1    ~ "Admission",
+    NOFU==1     | RETRNED==1| RETREFFU==1 | LEFTAMA==1  | TRANNH==1   | LEFTBTRI==1 | LEFTATRI==1 ~"Discharge",
+    DOA==1      | DIEDED==1      ~"Died",
+    NODISP==1   | OTHDISP==1     ~"Unknown")) %>%
+  select(-all_of(list.dispo.variables.12.15)) %>%
   # INJURY72 and INJURY_ENC don't exist
   # MED and GPMED only go up to MED12 and GPMED12 starting in 2013
   # RFV only goes up to RFV3
@@ -89,9 +174,15 @@ df <- read_dta("data-raw/ED2012-stata.dta") %>%
   rename(INJURY_ENC=INJR1) %>%
   select(CPSUM,CSTRATM,PATWT,RFV1:RFV3,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
          PAYTYPER,PAINSCALE,INJURY,CATSCAN,CTAB,
-         CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED12,GPMED1:GPMED12
+         CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED12,GPMED1:GPMED12,all_of(list.dispo.variables.12.15)
   ) %>% data.frame() %>% zap_labels() %>%
   mutate(YEAR=2012) %>%
+  mutate(DISPOSITION = case_when(
+    ADMITHOS==1 | OBSHOS==1 | OBSDIS==1   | TRANOTH==1  | TRANPSYC==1    ~ "Admission",
+    NOFU==1     | RETRNED==1| RETREFFU==1 | LEFTAMA==1  | TRANNH==1   | LEFTBTRI==1 | LEFTATRI==1 ~"Discharge",
+    DOA==1      | DIEDED==1      ~"Died",
+    NODISP==1   | OTHDISP==1     ~"Unknown")) %>%
+  select(-all_of(list.dispo.variables.12.15)) %>%
   #INJURY72 and INJURY_ENC don't exist
   #MED and GPMED only go up to MED12 and GPMED12
   #RFV only goes up to RFV3
@@ -107,9 +198,15 @@ df <- read_dta("data-raw/ED2011-stata.dta") %>%
   #CTAB and CTCHEST are incorporated into CTOTHER (all under CTNHEAD)
   select(CPSUM,CSTRATM,PATWT,RFV1:RFV3,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
          PAYTYPER,PAINSCALE,INJURY,CATSCAN,
-         CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED8,GPMED1:GPMED8
+         CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED8,GPMED1:GPMED8,all_of(list.dispo.variables.11)
   ) %>% data.frame() %>% zap_labels() %>%
   mutate(YEAR=2011) %>%
+  mutate(DISPOSITION = case_when(
+    ADMITHOS==1 | OBSHOS==1   | OBSDIS==1   | TRANOTH==1  | TRANPSYC==1    ~ "Admission",
+    NOFU==1     | RETREFFU==1 | LEFTAMA==1  | TRANNH==1   | LEFTBTRI==1 | LEFTATRI==1 ~"Discharge",
+    DOA==1      | DIEDED==1      ~"Died",
+    NODISP==1   | OTHDISP==1     ~"Unknown")) %>%
+  select(-all_of(list.dispo.variables.11)) %>%
   #INJURY72 and INJURY_ENC don't exist
   #MED and GPMED only go up to MED8 and GPMED8 starting in 2011
   #RFV only goes up to RFV3

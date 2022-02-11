@@ -86,9 +86,6 @@ summary(logit)
 
 print(round(exp(cbind(OR = coef(logit), confint(logit))),digits=3))
 
-
-
-
 #### 
 
 
