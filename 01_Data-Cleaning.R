@@ -41,8 +41,8 @@ df <- read_dta("data-raw/ED2019-stata.dta") %>%
   mutate(DISPOSITION = case_when(
     ADMITHOS==1 | OBSHOS==1 | OBSDIS==1   | TRANOTH==1  | TRANPSYC==1    ~ "Admission",
     NOFU==1     | RETRNED==1| RETREFFU==1 | LWBS==1     | LBTC==1 | LEFTAMA==1  | TRANNH==1  ~"Discharge",
-    DOA==1      | DIEDED==1      ~"Died",
-    NODISP==1   | OTHDISP==1     ~"Unknown")) %>%
+    DOA==1      | DIEDED==1          ~"Died",
+    T     ~"Unknown")) %>%
   select(-all_of(list.dispo.variables.16.19)) %>%
   mutate(YEAR=2019)
 
@@ -56,7 +56,7 @@ df <- read_dta("data-raw/ED2018-stata.dta") %>%
     ADMITHOS==1 | OBSHOS==1 | OBSDIS==1   | TRANOTH==1  | TRANPSYC==1    ~ "Admission",
     NOFU==1     | RETRNED==1| RETREFFU==1 | LWBS==1     | LBTC==1 | LEFTAMA==1  | TRANNH==1  ~"Discharge",
     DOA==1      | DIEDED==1      ~"Died",
-    NODISP==1   | OTHDISP==1     ~"Unknown")) %>%
+    T     ~"Unknown")) %>%
   select(-all_of(list.dispo.variables.16.19)) %>%
   mutate(YEAR=2018) %>%
   rbind(df)
@@ -70,7 +70,7 @@ df <- read_dta("data-raw/ED2017-stata.dta") %>%
     ADMITHOS==1 | OBSHOS==1 | OBSDIS==1   | TRANOTH==1  | TRANPSYC==1    ~ "Admission",
     NOFU==1     | RETRNED==1| RETREFFU==1 | LWBS==1     | LBTC==1 | LEFTAMA==1  | TRANNH==1  ~"Discharge",
     DOA==1      | DIEDED==1      ~"Died",
-    NODISP==1   | OTHDISP==1     ~"Unknown")) %>%
+    T     ~"Unknown")) %>%
   select(-all_of(list.dispo.variables.16.19)) %>%
   mutate(YEAR=2017) %>%
   rbind(df)
@@ -110,7 +110,7 @@ df <- read_dta("data-raw/ED2016-stata.dta") %>%
     ADMITHOS==1 | OBSHOS==1 | OBSDIS==1   | TRANOTH==1  | TRANPSYC==1    ~ "Admission",
     NOFU==1     | RETRNED==1| RETREFFU==1 | LWBS==1     | LBTC==1 | LEFTAMA==1  | TRANNH==1  ~"Discharge",
     DOA==1      | DIEDED==1      ~"Died",
-    NODISP==1   | OTHDISP==1     ~"Unknown")) %>%
+    T     ~"Unknown")) %>%
   select(-all_of(list.dispo.variables.16.19)) %>%
   mutate(YEAR=2016) %>%
   zap_labels() %>% rbind(df)
@@ -127,7 +127,7 @@ df <- read_dta("data-raw/ED2015-stata.dta") %>%
     ADMITHOS==1 | OBSHOS==1 | OBSDIS==1   | TRANOTH==1  | TRANPSYC==1    ~ "Admission",
     NOFU==1     | RETRNED==1| RETREFFU==1 | LEFTAMA==1  | TRANNH==1   | LEFTBTRI==1 | LEFTATRI==1 ~"Discharge",
     DOA==1      | DIEDED==1      ~"Died",
-    NODISP==1   | OTHDISP==1     ~"Unknown")) %>%
+    T     ~"Unknown")) %>%
   select(-all_of(list.dispo.variables.12.15)) %>%
   mutate(YEAR=2015) %>%
   rbind(df)
@@ -143,7 +143,7 @@ df <- read_dta("data-raw/ED2014-stata.dta") %>%
     ADMITHOS==1 | OBSHOS==1 | OBSDIS==1   | TRANOTH==1  | TRANPSYC==1    ~ "Admission",
     NOFU==1     | RETRNED==1| RETREFFU==1 | LEFTAMA==1  | TRANNH==1   | LEFTBTRI==1 | LEFTATRI==1 ~"Discharge",
     DOA==1      | DIEDED==1      ~"Died",
-    NODISP==1   | OTHDISP==1     ~"Unknown")) %>%
+    T     ~"Unknown")) %>%
   select(-all_of(list.dispo.variables.12.15)) %>%
   mutate(YEAR=2014) %>%
   rbind(df)
@@ -160,7 +160,7 @@ df <- read_dta("data-raw/ED2013-stata.dta") %>%
     ADMITHOS==1 | OBSHOS==1 | OBSDIS==1   | TRANOTH==1  | TRANPSYC==1    ~ "Admission",
     NOFU==1     | RETRNED==1| RETREFFU==1 | LEFTAMA==1  | TRANNH==1   | LEFTBTRI==1 | LEFTATRI==1 ~"Discharge",
     DOA==1      | DIEDED==1      ~"Died",
-    NODISP==1   | OTHDISP==1     ~"Unknown")) %>%
+    T     ~"Unknown")) %>%
   select(-all_of(list.dispo.variables.12.15)) %>%
   # INJURY72 and INJURY_ENC don't exist
   # MED and GPMED only go up to MED12 and GPMED12 starting in 2013
@@ -181,7 +181,7 @@ df <- read_dta("data-raw/ED2012-stata.dta") %>%
     ADMITHOS==1 | OBSHOS==1 | OBSDIS==1   | TRANOTH==1  | TRANPSYC==1    ~ "Admission",
     NOFU==1     | RETRNED==1| RETREFFU==1 | LEFTAMA==1  | TRANNH==1   | LEFTBTRI==1 | LEFTATRI==1 ~"Discharge",
     DOA==1      | DIEDED==1      ~"Died",
-    NODISP==1   | OTHDISP==1     ~"Unknown")) %>%
+    T     ~"Unknown")) %>%
   select(-all_of(list.dispo.variables.12.15)) %>%
   #INJURY72 and INJURY_ENC don't exist
   #MED and GPMED only go up to MED12 and GPMED12
@@ -205,7 +205,7 @@ df <- read_dta("data-raw/ED2011-stata.dta") %>%
     ADMITHOS==1 | OBSHOS==1   | OBSDIS==1   | TRANOTH==1  | TRANPSYC==1    ~ "Admission",
     NOFU==1     | RETREFFU==1 | LEFTAMA==1  | TRANNH==1   | LEFTBTRI==1 | LEFTATRI==1 ~"Discharge",
     DOA==1      | DIEDED==1      ~"Died",
-    NODISP==1   | OTHDISP==1     ~"Unknown")) %>%
+    T     ~"Unknown")) %>%
   select(-all_of(list.dispo.variables.11)) %>%
   #INJURY72 and INJURY_ENC don't exist
   #MED and GPMED only go up to MED8 and GPMED8 starting in 2011
@@ -234,7 +234,7 @@ df <- df %>%
     RACEUN==2 ~ "Black/African American",
     RACEUN==3 ~ "Asian",
     RACEUN==4 ~ "Native Hawaiian/Other Pacific Islander",
-    RACEUN==5 ~ "American Indian/Alaska Nastive",
+    RACEUN==5 ~ "American Indian/Alaska Native",
     RACEUN==6 ~ "More than one race reported",
     T ~ "Unknown"))) %>%
   mutate(ETHNICITY = factor(case_when(ETHUN==1 ~ "Hispanic or Latino",ETHUN==2 ~ "Not Hispanic or Latino",T ~ "Unknown"))) %>%

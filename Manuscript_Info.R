@@ -2,13 +2,14 @@ source("Libraries.R")
 source("Functions.R")
 
 # Identify all adults visits, 'chest pain' as reason for visit
-df <- readRDS("data-cleaned/df.rds") %>% 
+df <- readRDS("data-cleaned/df.rds") %>%
+  filter(AGE>17) %>%
   mutate(Total=1) %>%
   mutate(Adult = ifelse(AGE>17,1,0)) %>%
   mutate(Adult.Chest_Pain = ifelse(Adult==1 & Chest_Pain==1,1,0)) %>%
   mutate(SEX = relevel(SEX,ref="Female"),
          RACE = relevel(RACE,ref="White"),
-         AGE = cut(AGE,c(17,45,65,120)))
+         AGE = cut(AGE,c(17,29,39,49,64,200)))
 
 # Set up complex survey design
 library(survey)
@@ -40,10 +41,11 @@ df %>%
   geom_point(alpha=0.5)+
   geom_line()+
   scale_y_continuous(labels=scales::percent_format(),limits=c(0,NA))+
+  scale_x_continuous(breaks=c(2011:2019))+
   theme_bw()+
   xlab("")+ylab("")
 
-#### Make tables for UDS rate by sex/race ####
+#### Make tables for UDS rate by sex/race                 ####
 table.chest.pain <- data.frame()
 table.chest.pain[1,1] <- "White\nFemale"
 table.chest.pain[3,1] <- "Black\nFemale"
@@ -127,7 +129,7 @@ table <- table %>%
 
 
 
-#### Bar plots for UDS rate by sex/race   ####
+#### Bar plots for UDS rate by sex/race                   ####
 
 table %>%
   mutate(category = "All ED Visits") %>%
@@ -149,3 +151,71 @@ table %>%
   xlab("")+ylab("")+
   theme(legend.position="none")
 
+
+#### Table 1: Characteristics of ED visits... ####
+
+
+table <- data.frame()
+
+
+# loop over age categories
+age.cat = c("(17,29]","(29,39]","(39,49]","(49,64]","(64,200]")
+for (i in 1:length(age.cat)) {
+  table[i,1] <- age.cat[i]
+  table[i,2] <- round(svytotal(~Total,
+                         subset(cluster,AGE==age.cat[i]))[1])
+
+  table[i,3] <- round(svytotal(~Total,
+                         subset(cluster,AGE==age.cat[i] &
+                                  TOXSCREN==1))[1])
+  table[i,4] <- round(svytotal(~Total,
+                         subset(cluster,AGE==age.cat[i] &
+                                  Chest_Pain==1))[1])
+  table[i,5] <- round(svytotal(~Total,
+                         subset(cluster,AGE==age.cat[i] &
+                                  Chest_Pain==1 &
+                                  TOXSCREN==1))[1])
+}
+
+# loop over race
+race.cat = c("White","Black/African American","Asian",
+             "American Indian/Alaska Native","Native Hawaiian/Other Pacific Islander",
+             "More than one race reported","Unknown")
+for (i in 1:length(race.cat)) {
+  table[i+length(age.cat),1] <- race.cat[i]
+  table[i+length(age.cat),2] <- round(svytotal(~Total,
+                               subset(cluster,RACE==race.cat[i]))[1])
+  
+  table[i+length(age.cat),3] <- round(svytotal(~Total,
+                               subset(cluster,RACE==race.cat[i] &
+                                        TOXSCREN==1))[1])
+  table[i+length(age.cat),4] <- round(svytotal(~Total,
+                               subset(cluster,RACE==race.cat[i] &
+                                        Chest_Pain==1))[1])
+  table[i+length(age.cat),5] <- round(svytotal(~Total,
+                               subset(cluster,RACE==race.cat[i] &
+                                        Chest_Pain==1 &
+                                        TOXSCREN==1))[1])
+}
+
+table <- table %>%
+  rbind(
+    cbind(
+    c("Female","Male"),
+    df %>% group_by(SEX)                       %>% summarise(Count=sum(PATWT))                   %>% select(Count),
+    df %>% filter(TOXSCREN==1)                 %>% group_by(SEX) %>% summarise(Count=sum(PATWT)) %>% select(Count),
+    df %>% filter(Chest_Pain==1)               %>% group_by(SEX) %>% summarise(Count=sum(PATWT)) %>% select(Count),
+    df %>% filter(TOXSCREN==1 & Chest_Pain==1) %>% group_by(SEX) %>% summarise(Count=sum(PATWT)) %>% select(Count)
+    ) %>% setNames(colnames(table))
+  )
+
+table <- table %>% rbind(
+    cbind(
+         c("Discharge","Admit","Unknown","Died"),
+         df %>% group_by(DISPOSITION) %>%                                         summarise(Count = sum(PATWT))%>% arrange(-Count) %>% select(Count),
+         df %>% group_by(DISPOSITION) %>% filter(TOXSCREN==1)                 %>% summarise(Count = sum(PATWT))%>% arrange(-Count) %>% select(Count),
+         df %>% group_by(DISPOSITION) %>% filter(Chest_Pain==1)               %>% summarise(Count = sum(PATWT))%>% arrange(-Count) %>% select(Count),
+         df %>% group_by(DISPOSITION) %>% filter(TOXSCREN==1 & Chest_Pain==1) %>% summarise(Count = sum(PATWT))%>% arrange(-Count) %>% select(Count)
+    ) %>% setNames(colnames(table)))
+
+write.csv(table,"table.csv",row.names=FALSE)
