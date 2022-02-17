@@ -1,1 +1,1 @@
-Dan Overbeek (@beakerdan) and I do some exploratory analyses in NHAMCES related to ED visits for trauma, pain medications, pain scale, race/ethnicity and age.
+Dan Overbeek (@beakerdan) and I do some exploratory analyses in NHAMCES related to the utilization of urine drug screen for chest pain patients, looking at trends in use and breakdown of use across race/ethnicity and age.
