@@ -1,3 +1,5 @@
+#### Libraries, functions, data                       ####
+
 source("Libraries.R")
 source("Functions.R")
 
@@ -22,7 +24,7 @@ cluster <- svydesign(
   data=df,
   multicore=T)
 
-#### Figure 1, trend in UDS utilization                   ####
+#### Figure 1, trend in UDS utilization               ####
 
 df %>%
   group_by(YEAR) %>%
@@ -36,8 +38,9 @@ df %>%
   mutate(name = case_when(
     name=="Tox.Chest.Pain.Weighted" ~ "Chest Pain Visits",
     T ~ "All Visits")) %>%
-  rename(UDS=name) %>%
-  ggplot(aes(x=YEAR,y=value,color=UDS,group=UDS))+
+  rename(`Percent of ED Visits\nwith Urine Drug Screen`=name) %>%
+  ggplot(aes(x=YEAR,y=value,color=`Percent of ED Visits\nwith Urine Drug Screen`,
+             group=`Percent of ED Visits\nwith Urine Drug Screen`))+
   geom_point(alpha=0.5)+
   geom_line()+
   scale_y_continuous(labels=scales::percent_format(),limits=c(0,NA))+
@@ -45,7 +48,9 @@ df %>%
   theme_bw()+
   xlab("")+ylab("")
 
-#### Make tables for UDS rate by sex/race                 ####
+ggsave("Figures/Fig-1-trend.jpeg",height=4,width=7,dpi=600)
+
+#### Make tables for UDS rate by sex/race             ####
 table.chest.pain <- data.frame()
 table.chest.pain[1,1] <- "White\nFemale"
 table.chest.pain[3,1] <- "Black\nFemale"
@@ -129,7 +134,7 @@ table <- table %>%
 
 
 
-#### Bar plots for UDS rate by sex/race                   ####
+#### Figure 2, bar plots for UDS rate by sex/race     ####
 
 table %>%
   mutate(category = "All ED Visits") %>%
@@ -144,15 +149,22 @@ table %>%
   geom_text(aes(label=group,y=0.003,hjust=0),position=position_dodge(width=0.9),
             check_overlap=TRUE,
             angle=90,
-            fontface="bold")+
+            fontface="bold",
+            size=3)+
+  geom_text(aes(label=scales::percent(mean,accuracy=0.2),y=mean,hjust=-0.05,vjust=-0.05),
+            position=position_dodge(width=0.9),
+            check_overlap=TRUE,
+            angle=0,
+            size=2.3)+
   scale_y_continuous(labels=scales::percent_format())+
   scale_fill_brewer()+
   theme_bw()+
   xlab("")+ylab("")+
   theme(legend.position="none")
 
+ggsave("Figures/Fig-2-bar-plot.jpeg",height=4,width=5,dpi=600)
 
-#### Table 1: Characteristics of ED visits... ####
+#### Table 1: Characteristics of ED visits...         ####
 
 
 table <- data.frame()
@@ -219,3 +231,18 @@ table <- table %>% rbind(
     ) %>% setNames(colnames(table)))
 
 write.csv(table,"table.csv",row.names=FALSE)
+
+#### Table 2: Odds ratios                             ####
+library(aod)
+
+cluster_analysis_sample <- subset(cluster,Adult.Chest_Pain==1)
+
+cluster_logit <- subset(cluster_analysis_sample,RACE %in% c("White","Black/African American"))
+
+
+
+logit <- svyglm(TOXSCREN ~ SEX + RACE + YEAR, cluster_logit, family=quasibinomial)
+summary(logit)
+
+table <- data.frame(round(exp(cbind(OR = coef(logit), confint(logit))),digits=3))
+
