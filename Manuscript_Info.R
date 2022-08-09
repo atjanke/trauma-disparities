@@ -1,7 +1,6 @@
 #### Libraries, functions, data                       ####
 
 source("Libraries.R")
-source("Functions.R")
 
 # Identify all adults visits, 'chest pain' as reason for visit
 df <- readRDS("data-cleaned/df.rds") %>%
@@ -12,6 +11,9 @@ df <- readRDS("data-cleaned/df.rds") %>%
   mutate(SEX = relevel(SEX,ref="Female"),
          RACE = relevel(RACE,ref="White"),
          AGE = cut(AGE,c(17,29,39,49,64,200)))
+
+# only one RFV coded
+df <- df %>% filter(RFVs==1)
 
 # Set up complex survey design
 library(survey)

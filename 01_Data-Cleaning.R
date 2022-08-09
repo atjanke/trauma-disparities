@@ -35,7 +35,7 @@ list.dispo.variables.11    <- c("NODISP","NOFU","RETPRN","RETREFFU","LEFTBTRI","
 #### Individually load multiple data sets      ####
 df <- read_dta("data-raw/ED2019-stata.dta") %>%
   select(
-    CPSUM,CSTRATM,PATWT,RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,
+    HOSPCODE,CPSUM,CSTRATM,PATWT,RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,
     CATSCAN,CTAB,CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30,all_of(list.dispo.variables.16.19)
   ) %>% data.frame() %>% zap_labels() %>%
   mutate(DISPOSITION = case_when(
@@ -49,7 +49,7 @@ df <- read_dta("data-raw/ED2019-stata.dta") %>%
 
 df <- read_dta("data-raw/ED2018-stata.dta") %>%
   select(
-    CPSUM,CSTRATM,PATWT,RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,
+    HOSPCODE,CPSUM,CSTRATM,PATWT,RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,
     CATSCAN,CTAB,CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30,all_of(list.dispo.variables.16.19)
   ) %>% data.frame() %>% zap_labels() %>%
   mutate(DISPOSITION = case_when(
@@ -62,7 +62,7 @@ df <- read_dta("data-raw/ED2018-stata.dta") %>%
   rbind(df)
 
 df <- read_dta("data-raw/ED2017-stata.dta") %>%
-  select(CPSUM,CSTRATM,PATWT,RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
+  select(HOSPCODE,CPSUM,CSTRATM,PATWT,RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
          PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,CATSCAN,CTAB,
          CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30,all_of(list.dispo.variables.16.19)
   ) %>% data.frame() %>% zap_labels() %>%
@@ -77,7 +77,7 @@ df <- read_dta("data-raw/ED2017-stata.dta") %>%
 
 df <- read_dta("data-raw/ED2016-stata.dta") %>%
   select(
-    CPSUM,CSTRATM,PATWT,RFV1:RFV5,
+    HOSPCODE,CPSUM,CSTRATM,PATWT,RFV1:RFV5,
     VMONTH, #Visit month (1-12)
     VDAYR, #Day of week of visit (1-7)
     ARRTIME, #Arrival time (military time)
@@ -118,7 +118,7 @@ df <- read_dta("data-raw/ED2016-stata.dta") %>%
 df <- read_dta("data-raw/ED2015-stata.dta") %>%
   # We need to manually rename INJR1 --> INJURY_ENC
   rename(INJURY_ENC=INJR1) %>%
-  select(CPSUM,CSTRATM,PATWT,RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
+  select(HOSPCODE,CPSUM,CSTRATM,PATWT,RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
          PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,CATSCAN,CTAB,
          CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30,
          all_of(list.dispo.variables.12.15)
@@ -135,7 +135,7 @@ df <- read_dta("data-raw/ED2015-stata.dta") %>%
 df <- read_dta("data-raw/ED2014-stata.dta") %>%
   # We need to manually rename INJR1 --> INJURY_ENC
   rename(INJURY_ENC=INJR1) %>%
-  select(CPSUM,CSTRATM,PATWT,RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
+  select(HOSPCODE,CPSUM,CSTRATM,PATWT,RFV1:RFV5,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
          PAYTYPER,PAINSCALE,INJURY,INJURY72,INJURY_ENC,CATSCAN,CTAB,
          CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED30,GPMED1:GPMED30,all_of(list.dispo.variables.12.15)
   ) %>% data.frame() %>% zap_labels() %>%
@@ -151,7 +151,7 @@ df <- read_dta("data-raw/ED2014-stata.dta") %>%
 df <- read_dta("data-raw/ED2013-stata.dta") %>%
   # We need to manually rename INJR1 --> INJURY_ENC
   rename(INJURY_ENC=INJR1) %>%
-  select(CPSUM,CSTRATM,PATWT,RFV1:RFV3,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
+  select(HOSPCODE,CPSUM,CSTRATM,PATWT,RFV1:RFV3,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
          PAYTYPER,PAINSCALE,INJURY,CATSCAN,CTAB,
          CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED12,GPMED1:GPMED12,all_of(list.dispo.variables.12.15)
   ) %>% data.frame() %>% zap_labels() %>%
@@ -172,7 +172,7 @@ df <- read_dta("data-raw/ED2013-stata.dta") %>%
 df <- read_dta("data-raw/ED2012-stata.dta") %>%
   # We need to manually rename INJR1 --> INJURY_ENC
   rename(INJURY_ENC=INJR1) %>%
-  select(CPSUM,CSTRATM,PATWT,RFV1:RFV3,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
+  select(HOSPCODE,CPSUM,CSTRATM,PATWT,RFV1:RFV3,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
          PAYTYPER,PAINSCALE,INJURY,CATSCAN,CTAB,
          CTCHEST,CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED12,GPMED1:GPMED12,all_of(list.dispo.variables.12.15)
   ) %>% data.frame() %>% zap_labels() %>%
@@ -196,7 +196,7 @@ df <- read_dta("data-raw/ED2011-stata.dta") %>%
   # CTNHEAD (not head) rename to CTOTHER
   rename(CTOTHER=CTNHEAD) %>%
   #CTAB and CTCHEST are incorporated into CTOTHER (all under CTNHEAD)
-  select(CPSUM,CSTRATM,PATWT,RFV1:RFV3,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
+  select(HOSPCODE,CPSUM,CSTRATM,PATWT,RFV1:RFV3,VMONTH,VDAYR,ARRTIME,ARREMS,WAITTIME,AGE,SEX,RACEUN,ETHUN,
          PAYTYPER,PAINSCALE,INJURY,CATSCAN,
          CTHEAD,CTOTHER,CTUNK,ADMIT,TOXSCREN,MED,MED1:MED8,GPMED1:GPMED8,all_of(list.dispo.variables.11)
   ) %>% data.frame() %>% zap_labels() %>%
@@ -287,6 +287,8 @@ df <- df %>%
 
 # Build a chest pain chief complaint indicator
 df <- df %>%
+  mutate(Chest_Pain_1 = ifelse(
+    (RFV1>=10500 & RFV1<=10503) | RFV1==12650 | RFV1==25150,1,0)) %>%
   mutate(Chest_Pain = case_when(
       (RFV1>=10500 & RFV1<=10503) | RFV1==12650 | RFV1==25150 |
       (RFV2>=10500 & RFV2<=10503) | RFV2==12650 | RFV2==25150 |
@@ -294,6 +296,14 @@ df <- df %>%
       (RFV4>=10500 & RFV4<=10503) | RFV4==12650 | RFV4==25150 |
       (RFV5>=10500 & RFV5<=10503) | RFV5==12650 | RFV5==25150 
         ~ 1, T~0))
+
+RFV.count <- df %>% select(RFV1,RFV2,RFV3,RFV4,RFV5) %>% 
+  mutate(across(RFV1:RFV5,~ifelse(is.na(.),-9,.))) %>% 
+  mutate(across(RFV1:RFV5,~ifelse(.==-9,0,1))) %>% 
+  mutate(RFVs = RFV1+RFV2+RFV3+RFV4+RFV5) %>%
+  select(-RFV1,-RFV2,-RFV3,-RFV4,-RFV5)
+
+df <- cbind(df,RFV.count)
 
 #### Save the data                             ####
 
